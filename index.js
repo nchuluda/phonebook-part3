@@ -13,8 +13,8 @@ app.use(express.json())
 app.use(morgan(':method :url :res[content-length] - :response-time ms :body'))
 
 morgan.token('body', req => {
-    return JSON.stringify(req.body)
-  })
+  return JSON.stringify(req.body)
+})
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
@@ -25,21 +25,19 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
-  } else if (error.name = 'ValidationError') {
+  } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message })
   }
   next(error)
 }
 
-let persons = []
-
 app.get('/info', (request, response) => {
-    Person.countDocuments({}, { hint: "_id_" }).then(res => {
-      const count = res
-      let date = Date()
-      response.send(`<p>Phonebook has info for ${count} people</p><p>${date}</p>`)
-    })
+  Person.countDocuments({}, { hint: '_id_' }).then(res => {
+    const count = res
+    let date = Date()
+    response.send(`<p>Phonebook has info for ${count} people</p><p>${date}</p>`)
   })
+})
 
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
@@ -55,15 +53,18 @@ app.get('/api/persons/:id', (request, response, next) => {
       } else {
         response.status(404).end()
       }
-  })
-  .catch(error => next(error))
+    })
+    .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
-    .then(result => {
+    // .then(result => {
+    //   response.status(204).end()
+    // })
+    .then(
       response.status(204).end()
-    })
+    )
     .catch(error => next(error))
 })
 
@@ -87,7 +88,7 @@ app.post('/api/persons', (request, response, next) => {
   person.save().then(savedPerson => {
     response.json(savedPerson)
   })
-  .catch(error => next(error))
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
@@ -109,5 +110,5 @@ app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
+  console.log(`Server running on port ${PORT}`)
 })
