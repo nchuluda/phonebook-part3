@@ -30,8 +30,8 @@ if (process.argv.length === 5) {
     number: `${number}`,
   })
 
-  person.save().then(result => {
-    console.log('person saved!' + `${result}`)
+  person.save().then(() => {
+    console.log('person saved!')
     mongoose.connection.close()
   })
 }
